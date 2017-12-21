@@ -11,8 +11,7 @@ Pod::Spec.new do |s|
   s.license        = package['license']
   s.homepage       = package['homepage']
   s.source         = { :git => 'https://github.com/Microsoft/react-native-code-push.git', :tag => "v#{s.version}-beta"}
-  s.ios.deployment_target = '7.0'
-  s.tvos.deployment_target = '9.0'
+  s.platform       = :ios, '7.0'
   s.preserve_paths = '*.js'
   s.library        = 'z'
 
@@ -28,13 +27,4 @@ Pod::Spec.new do |s|
     ss.private_header_files = 'ios/CodePush/SSZipArchive/*.h', 'ios/CodePush/SSZipArchive/aes/*.h', 'ios/CodePush/SSZipArchive/minizip/*.h'
   end
 
-  s.subspec 'JWT' do |jwt|
-    jwt.source_files = 'ios/CodePush/JWT/**/*.{h,m}'
-    jwt.private_header_files = 'ios/CodePush/JWT/**/*.h'
-  end
-
-  s.subspec 'Base64' do |base64|
-    base64.source_files = 'ios/CodePush/Base64/**/*.{h,m}'
-    base64.private_header_files = 'ios/CodePush/Base64/**/*.h'
-  end
 end

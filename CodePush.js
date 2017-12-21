@@ -4,12 +4,11 @@ import requestFetchAdapter from "./request-fetch-adapter";
 import { AppState, Platform } from "react-native";
 import RestartManager from "./RestartManager";
 import log from "./logging";
-import hoistStatics from 'hoist-non-react-statics';
 
 let NativeCodePush = require("react-native").NativeModules.CodePush;
 const PackageMixins = require("./package-mixins")(NativeCodePush);
 
-async function checkForUpdate(deploymentKey = null, handleBinaryVersionMismatchCallback = null) {
+async function checkForUpdate(deploymentKey = null) {
   /*
    * Before we ask the server if an update exists, we
    * need to retrieve three pieces of information from the
@@ -20,6 +19,7 @@ async function checkForUpdate(deploymentKey = null, handleBinaryVersionMismatchC
    * different from the CodePush update they have already installed.
    */
   const nativeConfig = await getConfiguration();
+
   /*
    * If a deployment key was explicitly provided,
    * then let's override the one we retrieved
@@ -76,9 +76,6 @@ async function checkForUpdate(deploymentKey = null, handleBinaryVersionMismatchC
       (!localPackage || localPackage._isDebugOnly) && config.packageHash === update.packageHash) {
     if (update && update.updateAppVersion) {
       log("An update is available but it is not targeting the binary version of your app.");
-      if (handleBinaryVersionMismatchCallback && typeof handleBinaryVersionMismatchCallback === "function") {
-        handleBinaryVersionMismatchCallback(update)
-      }
     }
 
     return null;
@@ -240,7 +237,7 @@ const sync = (() => {
   let syncInProgress = false;
   const setSyncCompleted = () => { syncInProgress = false; };
 
-  return (options = {}, syncStatusChangeCallback, downloadProgressCallback, handleBinaryVersionMismatchCallback) => {
+  return (options = {}, syncStatusChangeCallback, downloadProgressCallback) => {
     let syncStatusCallbackWithTryCatch, downloadProgressCallbackkWithTryCatch;
     if (typeof syncStatusChangeCallback === "function") {
       syncStatusCallbackWithTryCatch = (...args) => {
@@ -270,7 +267,7 @@ const sync = (() => {
     }
 
     syncInProgress = true;
-    const syncPromise = syncInternal(options, syncStatusCallbackWithTryCatch, downloadProgressCallbackkWithTryCatch, handleBinaryVersionMismatchCallback);
+    const syncPromise = syncInternal(options, syncStatusCallbackWithTryCatch, downloadProgressCallbackkWithTryCatch);
     syncPromise
       .then(setSyncCompleted)
       .catch(setSyncCompleted);
@@ -288,7 +285,7 @@ const sync = (() => {
  * releases, and displaying a standard confirmation UI to the end-user
  * when an update is available.
  */
-async function syncInternal(options = {}, syncStatusChangeCallback, downloadProgressCallback, handleBinaryVersionMismatchCallback) {
+async function syncInternal(options = {}, syncStatusChangeCallback, downloadProgressCallback) {
   let resolvedInstallMode;
   const syncOptions = {
     deploymentKey: null,
@@ -343,7 +340,7 @@ async function syncInternal(options = {}, syncStatusChangeCallback, downloadProg
     await CodePush.notifyApplicationReady();
 
     syncStatusChangeCallback(CodePush.SyncStatus.CHECKING_FOR_UPDATE);
-    const remotePackage = await checkForUpdate(syncOptions.deploymentKey, handleBinaryVersionMismatchCallback);
+    const remotePackage = await checkForUpdate(syncOptions.deploymentKey);
 
     const doDownloadAndInstall = async () => {
       syncStatusChangeCallback(CodePush.SyncStatus.DOWNLOADING_PACKAGE);
@@ -452,7 +449,7 @@ function codePushify(options = {}) {
   }
 
   var decorator = (RootComponent) => {
-    const extended = class CodePushComponent extends React.Component {
+    return class CodePushComponent extends React.Component {
       componentDidMount() {
         if (options.checkFrequency === CodePush.CheckFrequency.MANUAL) {
           CodePush.notifyAppReady();
@@ -475,15 +472,7 @@ function codePushify(options = {}) {
             }
           }
 
-          let handleBinaryVersionMismatchCallback;
-          if (rootComponentInstance && rootComponentInstance.codePushOnBinaryVersionMismatch) {
-            handleBinaryVersionMismatchCallback = rootComponentInstance.codePushOnBinaryVersionMismatch;
-            if (rootComponentInstance instanceof React.Component) {
-              handleBinaryVersionMismatchCallback = handleBinaryVersionMismatchCallback.bind(rootComponentInstance);
-            }
-          }
-
-          CodePush.sync(options, syncStatusCallback, downloadProgressCallback, handleBinaryVersionMismatchCallback);
+          CodePush.sync(options, syncStatusCallback, downloadProgressCallback);
           if (options.checkFrequency === CodePush.CheckFrequency.ON_APP_RESUME) {
             ReactNative.AppState.addEventListener("change", (newState) => {
               newState === "active" && CodePush.sync(options, syncStatusCallback, downloadProgressCallback);
@@ -504,8 +493,6 @@ function codePushify(options = {}) {
         return <RootComponent {...props} />
       }
     }
-
-    return hoistStatics(extended, RootComponent);
   }
 
   if (typeof options === "function") {

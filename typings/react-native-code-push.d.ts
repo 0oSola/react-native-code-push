@@ -19,7 +19,6 @@ interface Promise<T> {
 
 export type DowloadProgressCallback = (progress: DownloadProgress) => void;
 export type SyncStatusChangedCallback = (status: CodePush.SyncStatus) => void;
-export type HandleBinaryVersionMismatchCallback = (update: RemotePackage) => void;
 
 export interface CodePushOptions extends SyncOptions {
     /**
@@ -246,10 +245,8 @@ declare namespace CodePush {
      * Asks the CodePush service whether the configured app deployment has an update available.
      *
      * @param deploymentKey The deployment key to use to query the CodePush server for an update.
-     * 
-     * @param handleBinaryVersionMismatchCallback An optional callback for handling target binary version mismatch
      */
-    function checkForUpdate(deploymentKey?: string, handleBinaryVersionMismatchCallback?: HandleBinaryVersionMismatchCallback): Promise<RemotePackage>;
+    function checkForUpdate(deploymentKey?: string): Promise<RemotePackage>;
 
     /**
      * Retrieves the metadata for an installed update (e.g. description, mandatory).
@@ -286,9 +283,8 @@ declare namespace CodePush {
      * @param options Options used to configure the end-user update experience (e.g. show an prompt?, install the update immediately?).
      * @param syncStatusChangedCallback An optional callback that allows tracking the status of the sync operation, as opposed to simply checking the resolved state via the returned Promise.
      * @param downloadProgressCallback An optional callback that allows tracking the progress of an update while it is being downloaded.
-     * @param handleBinaryVersionMismatchCallback An optional callback for handling target binary version mismatch
      */
-    function sync(options?: SyncOptions, syncStatusChangedCallback?: SyncStatusChangedCallback, downloadProgressCallback?: DowloadProgressCallback, handleBinaryVersionMismatchCallback?: HandleBinaryVersionMismatchCallback): Promise<SyncStatus>;
+    function sync(options?: SyncOptions, syncStatusChangedCallback?: SyncStatusChangedCallback, downloadProgressCallback?: DowloadProgressCallback): Promise<SyncStatus>;
 
     /**
      * Indicates when you would like an installed update to actually be applied.
@@ -323,34 +319,6 @@ declare namespace CodePush {
      */
     enum SyncStatus {
         /**
-         * The app is up-to-date with the CodePush server.
-         */
-        UP_TO_DATE,
-            
-        /**
-         * An available update has been installed and will be run either immediately after the
-         * syncStatusChangedCallback function returns or the next time the app resumes/restarts,
-         * depending on the InstallMode specified in SyncOptions
-         */
-        UPDATE_INSTALLED,
-            
-        /**
-         * The app had an optional update which the end user chose to ignore.
-         * (This is only applicable when the updateDialog is used)
-         */
-        UPDATE_IGNORED,
-            
-        /**
-         * The sync operation encountered an unknown error.
-         */
-        UNKNOWN_ERROR,
-        
-        /**
-         * There is an ongoing sync operation running which prevents the current call from being executed.
-         */
-        SYNC_IN_PROGRESS,
-            
-        /**
          * The CodePush server is being queried for an update.
          */
         CHECKING_FOR_UPDATE,
@@ -369,7 +337,35 @@ declare namespace CodePush {
         /**
          * An available update was downloaded and is about to be installed.
          */
-        INSTALLING_UPDATE
+        INSTALLING_UPDATE,
+
+        /**
+         * The app is up-to-date with the CodePush server.
+         */
+        UP_TO_DATE,
+
+        /**
+         * The app had an optional update which the end user chose to ignore.
+         * (This is only applicable when the updateDialog is used)
+         */
+        UPDATE_IGNORED,
+
+        /**
+         * An available update has been installed and will be run either immediately after the
+         * syncStatusChangedCallback function returns or the next time the app resumes/restarts,
+         * depending on the InstallMode specified in SyncOptions
+         */
+        UPDATE_INSTALLED,
+
+        /**
+         * There is an ongoing sync operation running which prevents the current call from being executed.
+         */
+        SYNC_IN_PROGRESS,
+
+        /**
+         * The sync operation encountered an unknown error.
+         */
+        UNKNOWN_ERROR
     }
 
     /**

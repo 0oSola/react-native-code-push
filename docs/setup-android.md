@@ -66,8 +66,6 @@ After installing the plugin and syncing your Android Studio project with Gradle,
 
 **For React Native >= v0.29**
 
-If you are integrating Code Push into React Native application please do the following steps:
-
 Update the `MainApplication.java` file to use CodePush via the following changes:
 
 ```java
@@ -98,48 +96,6 @@ public class MainApplication extends Application implements ReactApplication {
             );
         }
     };
-}
-```
-
-*NOTE: For React Native v0.49+ please be sure that `getJSMainModuleName` function in the `MainApplication.java` file determines correct URL to fetch JS bundle (used when dev support is enabled, see [this](https://github.com/facebook/react-native/blob/c7f37074ac89f7e568ca26a6bad3bdb02812c39f/ReactAndroid/src/main/java/com/facebook/react/ReactNativeHost.java#L124) for more details) e.g.*
-```
-@Override
-protected String getJSMainModuleName() {
-    return "index";
-}
-```
-
-If you are integrating React Native into existing native application please do the following steps:
-
-Update `MyReactActivity.java` (it could be named differently in your app) file to use CodePush via the following changes:
-
-```java
-...
-// 1. Import the plugin class.
-import com.microsoft.codepush.react.CodePush;
-
-public class MyReactActivity extends Activity {
-    private ReactRootView mReactRootView;
-    private ReactInstanceManager mReactInstanceManager;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        ...
-        mReactInstanceManager = ReactInstanceManager.builder()
-                // ...
-                // Add CodePush package
-                .addPackage(new CodePush("deployment-key-here", getApplicationContext(), BuildConfig.DEBUG))
-                // Get the JS Bundle File via Code Push
-                .setJSBundleFile(CodePush.getJSBundleFile())
-                // ...
-                
-                .build();
-        mReactRootView.startReactApplication(mReactInstanceManager, "MyReactNativeApp", null);
-
-        setContentView(mReactRootView);
-    }
-
-    ...
 }
 ```
 
@@ -229,47 +185,3 @@ public class MainApplication extends Application {
 ```
 
 In order to effectively make use of the `Staging` and `Production` deployments that were created along with your CodePush app, refer to the [multi-deployment testing](../README.md#multi-deployment-testing) docs below before actually moving your app's usage of CodePush into production.
-
-#### Code Signing setup
-
-Starting with CLI version **2.1.0** you can self sign bundles during release and verify its signature before installation of update. For more info about Code Signing please refer to [relevant code-push documentation section](https://github.com/Microsoft/code-push/tree/master/cli#code-signing). In order to use Public Key for Code Signing you need to do following steps:
-
- 1. Add `CodePushPublicKey` string item to `/path_to_your_app/android/app/src/main/res/values/strings.xml`. It may looks like this:
-
- ```xml
- <resources>
-    <string name="app_name">my_app</string>
-    <string name="CodePushPublicKey">-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtPSR9lkGzZ4FR0lxF+ZA
-P6jJ8+Xi5L601BPN4QESoRVSrJM08roOCVrs4qoYqYJy3Of2cQWvNBEh8ti3FhHu
-tiuLFpNdfzM4DjAw0Ti5hOTfTixqVBXTJPYpSjDh7K6tUvp9MV0l5q/Ps3se1vud
-M1/X6g54lIX/QoEXTdMgR+SKXvlUIC13T7GkDHT6Z4RlwxkWkOmf2tGguRcEBL6j
-ww7w/3g0kWILz7nNPtXyDhIB9WLH7MKSJWdVCZm+cAqabUfpCFo7sHiyHLnUxcVY
-OTw3sz9ceaci7z2r8SZdsfjyjiDJrq69eWtvKVUpredy9HtyALtNuLjDITahdh8A
-zwIDAQAB
------END PUBLIC KEY-----</string>
-</resources>
- ```
-
- 2. Configure `CodePush` instance to use this parameter
-
- * using constructor
-
-```java
-new CodePush(
-    "deployment-key",
-    getApplicationContext(),
-    BuildConfig.DEBUG,
-    R.string.CodePushPublicKey)
-```
-
- or
-
- * using builder
-
- ```java
-new CodePushBuilder("deployment-key-here",getApplicationContext())
-    .setIsDebugMode(BuildConfig.DEBUG)
-    .setPublicKeyResourceDescriptor(R.string.CodePushPublicKey)
-    .build()
-```

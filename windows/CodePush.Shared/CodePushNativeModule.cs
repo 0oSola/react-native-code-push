@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 #if WINDOWS_UWP
 using Windows.Web.Http;
@@ -313,7 +312,17 @@ namespace CodePush.ReactNative
         {
             // #1) Get the private ReactInstanceManager, which is what includes
             //     the logic to reload the current React context.
-            var reactInstanceManager = _codePush.ReactInstanceManager;
+            FieldInfo info = typeof(ReactPage)
+                .GetField("_reactInstanceManager", BindingFlags.NonPublic | BindingFlags.Instance);
+#if WINDOWS_UWP
+            var reactInstanceManager = (ReactInstanceManager)typeof(ReactPage)
+                .GetField("_reactInstanceManager", BindingFlags.NonPublic | BindingFlags.Instance)
+                .GetValue(_codePush.MainPage);
+#else
+            var reactInstanceManager = ((Lazy<IReactInstanceManager>)typeof(ReactPage)
+                .GetField("_reactInstanceManager", BindingFlags.NonPublic | BindingFlags.Instance)
+                .GetValue(_codePush.MainPage)).Value as ReactInstanceManager;
+#endif
 
             // #2) Update the locally stored JS bundle file path
             Type reactInstanceManagerType = typeof(ReactInstanceManager);
@@ -323,7 +332,7 @@ namespace CodePush.ReactNative
                 .SetValue(reactInstanceManager, latestJSBundleFile);
 
             // #3) Get the context creation method and fire it on the UI thread (which RN enforces)
-            Context.RunOnDispatcherQueueThread(() => reactInstanceManager.RecreateReactContextAsync(CancellationToken.None));
+            Context.RunOnDispatcherQueueThread(reactInstanceManager.RecreateReactContextInBackground);
         }
     }
 }
