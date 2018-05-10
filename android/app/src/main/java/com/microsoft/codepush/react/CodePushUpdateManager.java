@@ -1,5 +1,7 @@
 package com.microsoft.codepush.react;
 
+import com.facebook.react.bridge.ReactContext;
+
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -71,6 +73,7 @@ public class CodePushUpdateManager {
     public String getCurrentPackageFolderPath() {
         JSONObject info = getCurrentPackageInfo();
         String packageHash = info.optString(CodePushConstants.CURRENT_PACKAGE_KEY, null);
+        System.out.println("season test1:"+packageHash);
         if (packageHash == null) {
             return null;
         }
@@ -139,7 +142,7 @@ public class CodePushUpdateManager {
         }
     }
 
-    public void downloadPackage(JSONObject updatePackage, String expectedBundleFileName,
+    public void downloadPackage(ReactContext context, JSONObject updatePackage, String expectedBundleFileName,
                                 DownloadProgressCallback progressCallback) throws IOException {
         String newUpdateHash = updatePackage.optString(CodePushConstants.PACKAGE_HASH_KEY, null);
         String newUpdateFolderPath = getPackageFolderPath(newUpdateHash);
@@ -223,12 +226,12 @@ public class CodePushUpdateManager {
             boolean isDiffUpdate = FileUtils.fileAtPathExists(diffManifestFilePath);
             if (isDiffUpdate) {
                 String currentPackageFolderPath = getCurrentPackageFolderPath();
-                CodePushUpdateUtils.copyNecessaryFilesFromCurrentPackage(diffManifestFilePath, currentPackageFolderPath, newUpdateFolderPath);
+                CodePushUpdateUtils.copyNecessaryFilesFromCurrentPackage(context,diffManifestFilePath, currentPackageFolderPath, newUpdateFolderPath);
                 File diffManifestFile = new File(diffManifestFilePath);
                 diffManifestFile.delete();
             }
 
-            FileUtils.copyDirectoryContents(unzippedFolderPath, newUpdateFolderPath);
+            FileUtils.copyDirectoryContents(context,unzippedFolderPath, newUpdateFolderPath);
             FileUtils.deleteFileAtPathSilently(unzippedFolderPath);
 
             // For zip updates, we need to find the relative path to the jsBundle and save it in the

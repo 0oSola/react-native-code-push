@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactPackage;
-import com.facebook.react.bridge.JavaScriptModule;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.uimanager.ViewManager;
@@ -130,6 +129,7 @@ public class CodePush implements ReactPackage {
 
     public static String getJSBundleFile() {
         return CodePush.getJSBundleFile(CodePushConstants.DEFAULT_JS_BUNDLE_NAME);
+        //return CodePush.getJSBundleFile(CodePushConstants.DEFAULT_JS_BUNDLE_NAME);
     }
 
     public static String getJSBundleFile(String assetsBundleFileName) {
@@ -142,7 +142,7 @@ public class CodePush implements ReactPackage {
 
     public String getJSBundleFileInternal(String assetsBundleFileName) {
         this.mAssetsBundleFileName = assetsBundleFileName;
-        String binaryJsBundleUrl = CodePushConstants.ASSETS_BUNDLE_PREFIX + assetsBundleFileName;
+        String binaryJsBundleUrl = CodePushConstants.ASSETS_BUNDLE_PREFIX +assetsBundleFileName;
         long binaryResourcesModifiedTime = this.getBinaryResourcesModifiedTime();
 
         try {

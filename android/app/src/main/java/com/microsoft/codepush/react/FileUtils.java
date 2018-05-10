@@ -1,5 +1,9 @@
 package com.microsoft.codepush.react;
 
+import android.util.Log;
+
+import com.facebook.react.bridge.ReactContext;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,16 +19,26 @@ public class FileUtils {
 
     private static final int WRITE_BUFFER_SIZE = 1024 * 8;
 
-    public static void copyDirectoryContents(String sourceDirectoryPath, String destinationDirectoryPath) throws IOException {
-        File sourceDir = new File(sourceDirectoryPath);
+    public static void copyDirectoryContents(ReactContext context, String sourceDirectoryPath, String destinationDirectoryPath) throws IOException {
+        File sourceDir;
         File destDir = new File(destinationDirectoryPath);
         if (!destDir.exists()) {
             destDir.mkdir();
         }
 
+        System.out.println("seasonTest:"+sourceDirectoryPath);
+
+        if (sourceDirectoryPath ==null || sourceDirectoryPath.isEmpty()) {
+            sourceDirectoryPath = FileCopyUtils.createCodePushFile(context);
+            sourceDir = new File(sourceDirectoryPath);
+        }else{
+            sourceDir = new File(sourceDirectoryPath);
+        }
+
         for (File sourceFile : sourceDir.listFiles()) {
+            Log.v("season----",sourceFile.getName());
             if (sourceFile.isDirectory()) {
-                copyDirectoryContents(
+                copyDirectoryContents(context,
                         CodePushUtils.appendPathComponent(sourceDirectoryPath, sourceFile.getName()),
                         CodePushUtils.appendPathComponent(destinationDirectoryPath, sourceFile.getName()));
             } else {
@@ -187,4 +201,7 @@ public class FileUtils {
             if (out != null) out.close();
         }
     }
+
+
+
 }

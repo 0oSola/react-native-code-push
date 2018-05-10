@@ -2,6 +2,8 @@ package com.microsoft.codepush.react;
 
 import android.content.Context;
 
+import com.facebook.react.bridge.ReactContext;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -67,8 +69,8 @@ public class CodePushUpdateUtils {
         return String.format("%064x", new java.math.BigInteger(1, hash));
     }
 
-    public static void copyNecessaryFilesFromCurrentPackage(String diffManifestFilePath, String currentPackageFolderPath, String newPackageFolderPath) throws IOException{
-        FileUtils.copyDirectoryContents(currentPackageFolderPath, newPackageFolderPath);
+    public static void copyNecessaryFilesFromCurrentPackage(ReactContext context, String diffManifestFilePath, String currentPackageFolderPath, String newPackageFolderPath) throws IOException{
+        FileUtils.copyDirectoryContents(context,currentPackageFolderPath, newPackageFolderPath);
         JSONObject diffManifest = CodePushUtils.getJsonObjectFromFile(diffManifestFilePath);
         try {
             JSONArray deletedFiles = diffManifest.getJSONArray("deletedFiles");
