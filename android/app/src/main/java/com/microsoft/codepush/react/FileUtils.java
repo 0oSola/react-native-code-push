@@ -26,9 +26,10 @@ public class FileUtils {
             destDir.mkdir();
         }
 
-        System.out.println("seasonTest:"+sourceDirectoryPath);
+        System.out.println("seasonTest sourceDirectoryPath:"+sourceDirectoryPath);
 
         if (sourceDirectoryPath ==null || sourceDirectoryPath.isEmpty()) {
+            System.out.println("==== create source folder=====");
             sourceDirectoryPath = FileCopyUtils.createCodePushFile(context);
             sourceDir = new File(sourceDirectoryPath);
         }else{

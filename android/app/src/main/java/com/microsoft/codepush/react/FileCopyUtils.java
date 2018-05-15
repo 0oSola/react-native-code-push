@@ -132,7 +132,10 @@ public class FileCopyUtils {
 
     public static String createCodePushFile(Context context){
         String mBinaryContentsHash = CodePushUpdateUtils.getHashForBinaryContents(context, false);
-        String deployKey = "5XhoengfOgeKDu5iJPeCU4SmBkXs4ksvOXqog";
+        String deployKey = CodePush.getCodePushInstance().getDeploymentKey();
+        Log.v("season deploymentKey",deployKey+"");
+        Log.v("source mBinaryContentsHash",mBinaryContentsHash+"");
+
         //String mBinaryContentsHash = "e9c79effc5b6bb19d54a6af676c513b96d4c8cac876dc5b857d47ed790bb2ad7";
 
         String codePushHashPath = "";
@@ -201,6 +204,7 @@ public class FileCopyUtils {
                     mJSONObject.putOpt("bundlePath","/CodePush/index.android.bundle");
                     mJSONObject.putOpt("deploymentKey",deployKey);
 
+
                     createJSON(packageFilePath,mJSONObject.toString());
 
                 }catch (Exception e){
@@ -214,6 +218,7 @@ public class FileCopyUtils {
 
     public static void createJSON(String FilePath,String data) {
         try {
+
             File writename = new File(FilePath);
             writename.createNewFile();
             BufferedWriter out = new BufferedWriter(new FileWriter(writename));

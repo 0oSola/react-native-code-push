@@ -70,6 +70,7 @@ public class CodePushUpdateUtils {
     }
 
     public static void copyNecessaryFilesFromCurrentPackage(ReactContext context, String diffManifestFilePath, String currentPackageFolderPath, String newPackageFolderPath) throws IOException{
+        System.out.println("=======start copy currentPackage======");
         FileUtils.copyDirectoryContents(context,currentPackageFolderPath, newPackageFolderPath);
         JSONObject diffManifest = CodePushUtils.getJsonObjectFromFile(diffManifestFilePath);
         try {
@@ -136,6 +137,12 @@ public class CodePushUpdateUtils {
         // The JSON serialization turns path separators into "\/", e.g. "CodePush\/assets\/image.png"
         String updateContentsManifestString = updateContentsJSONArray.toString().replace("\\/", "/");
         String updateContentsManifestHash = computeHash(new ByteArrayInputStream(updateContentsManifestString.getBytes()));
+
+        System.out.println("=====getDiffBuffer=====");
+        System.out.println(updateContentsManifestString);
+        System.out.println(updateContentsManifestHash);
+        System.out.println(expectedHash);
+
         if (!expectedHash.equals(updateContentsManifestHash)) {
             throw new CodePushInvalidUpdateException("The update contents failed the data integrity check.");
         }

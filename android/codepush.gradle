@@ -54,7 +54,10 @@ gradle.projectsEvaluated {
             if (!resourcesDir.exists() && file("$buildDir/intermediates/res/${targetPath}").exists()) {
                 resourcesDir = file("$buildDir/intermediates/res/${targetPath}")
             }
-            
+
+            //resource 路径
+            resourcesDir = file("$buildDir/intermediates/assets/release/source/CodePush") 
+
             def jsBundleFile = file("$jsBundleDir/$bundleAssetName")
 
             def resourcesMapTempFileName = "CodePushResourcesMap-" + java.util.UUID.randomUUID().toString().substring(0,8) + ".json"

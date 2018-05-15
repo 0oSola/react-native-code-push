@@ -27,7 +27,11 @@ var jsBundleFilePath = process.argv[3];
 var assetsDir = process.argv[4];
 var tempFileName = process.argv[5];
 
+console.log("======sola:",tempFileName);
+
 var tempFileLocalPath = path.join(require("os").tmpdir(), tempFileName);
+
+console.log("======sola:",tempFileLocalPath);
 var resourceFiles = [];
 
 getFilesInFolder(resourcesDir, resourceFiles);
@@ -35,16 +39,29 @@ getFilesInFolder(resourcesDir, resourceFiles);
 var oldFileToModifiedTimeMap = require(tempFileLocalPath);
 var newFileToModifiedTimeMap = {};
 
+console.log("test========");
+console.log(resourceFiles);
+console.log("test========");
+
 resourceFiles.forEach(function(resourceFile) {
     newFileToModifiedTimeMap[resourceFile.path.substring(resourcesDir.length)] = resourceFile.mtime;
 });
 
+
+    console.log("test after========");
+    console.log(resourceFiles);
+    console.log("test after========");
+
 var bundleGeneratedAssetFiles = [];
 
 for (var newFilePath in newFileToModifiedTimeMap) {
+    bundleGeneratedAssetFiles.push(newFilePath);
+    /*console.log("test filter before========");
+    console.log(oldFileToModifiedTimeMap[newFilePath],oldFileToModifiedTimeMap[newFilePath],newFileToModifiedTimeMap[newFilePath].getTime());
+    console.log("test filter after========");
     if (!oldFileToModifiedTimeMap[newFilePath] || oldFileToModifiedTimeMap[newFilePath] < newFileToModifiedTimeMap[newFilePath].getTime()) {
         bundleGeneratedAssetFiles.push(newFilePath);
-    }
+    }*/
 }
 
 var manifest = [];
@@ -63,33 +80,44 @@ if (bundleGeneratedAssetFiles.length) {
 }
 
 function addJsBundleAndMetaToManifest() {
-    addFileToManifest(path.dirname(jsBundleFilePath), path.basename(jsBundleFilePath), manifest, function() {
+    /*addFileToManifest(path.dirname(jsBundleFilePath), path.basename(jsBundleFilePath), manifest, function() {
         var jsBundleMetaFilePath = jsBundleFilePath + ".meta";
         addFileToManifest(path.dirname(jsBundleMetaFilePath), path.basename(jsBundleMetaFilePath), manifest, function() {
-            manifest = manifest.sort();
-            var finalHash = crypto.createHash(HASH_ALGORITHM)
-                .update(JSON.stringify(manifest))
-                .digest("hex");
-
-            console.log(finalHash);
-
-            var savedResourcesManifestPath = assetsDir + "/" + CODE_PUSH_HASH_FILE_NAME;
-            fs.writeFileSync(savedResourcesManifestPath, finalHash);
-
-            // "CodePushHash.json" file name breaks flow type checking.
-            // To fix the issue we need to delete "CodePushHash.json" file and
-            // use "CodePushHash" file name instead to store the hash value.
-            // Relates to https://github.com/Microsoft/react-native-code-push/issues/577
-            var oldSavedResourcesManifestPath = assetsDir + "/" + CODE_PUSH_HASH_OLD_FILE_NAME;
-            if (fs.existsSync(oldSavedResourcesManifestPath)) {
-                fs.unlinkSync(oldSavedResourcesManifestPath);
-            }
+            
         });
-    });
+    });*/
+    manifest = manifest.sort();
+    console.log("=================");
+    console.log(manifest);
+    console.log("=================");
+    var finalHash = crypto.createHash(HASH_ALGORITHM)
+        .update(JSON.stringify(manifest))
+        .digest("hex");
+
+    console.log(finalHash);
+
+    var savedResourcesManifestPath = assetsDir + "/" + CODE_PUSH_HASH_FILE_NAME;
+    fs.writeFileSync(savedResourcesManifestPath, finalHash);
+
+    // "CodePushHash.json" file name breaks flow type checking.
+    // To fix the issue we need to delete "CodePushHash.json" file and
+    // use "CodePushHash" file name instead to store the hash value.
+    // Relates to https://github.com/Microsoft/react-native-code-push/issues/577
+    var oldSavedResourcesManifestPath = assetsDir + "/" + CODE_PUSH_HASH_OLD_FILE_NAME;
+    if (fs.existsSync(oldSavedResourcesManifestPath)) {
+        fs.unlinkSync(oldSavedResourcesManifestPath);
+    }
 }
 
 function addFileToManifest(folder, assetFile, manifest, done) {
     var fullFilePath = path.join(folder, assetFile);
+
+    console.log("=================");
+    console.log(folder);
+    console.log(assetFile);
+    console.log(manifest);
+    console.log("=================");
+
     if (!fileExists(fullFilePath)) {
         done();
         return;

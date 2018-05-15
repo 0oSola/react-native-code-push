@@ -214,17 +214,24 @@ public class CodePushUpdateManager {
             }
         }
 
+
+
         if (isZip) {
+            System.out.println("=====isZip=====");
             // Unzip the downloaded file and then delete the zip
             String unzippedFolderPath = getUnzippedFolderPath();
             FileUtils.unzipFile(downloadFile, unzippedFolderPath);
             FileUtils.deleteFileOrFolderSilently(downloadFile);
 
+
             // Merge contents with current update based on the manifest
+
             String diffManifestFilePath = CodePushUtils.appendPathComponent(unzippedFolderPath,
                     CodePushConstants.DIFF_MANIFEST_FILE_NAME);
             boolean isDiffUpdate = FileUtils.fileAtPathExists(diffManifestFilePath);
+            System.out.println("=====DiffUpdatePath====="+diffManifestFilePath);
             if (isDiffUpdate) {
+                System.out.println("=====isDiffUpdate====="+isDiffUpdate);
                 String currentPackageFolderPath = getCurrentPackageFolderPath();
                 CodePushUpdateUtils.copyNecessaryFilesFromCurrentPackage(context,diffManifestFilePath, currentPackageFolderPath, newUpdateFolderPath);
                 File diffManifestFile = new File(diffManifestFilePath);

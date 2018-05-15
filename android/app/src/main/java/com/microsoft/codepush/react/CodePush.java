@@ -129,7 +129,6 @@ public class CodePush implements ReactPackage {
 
     public static String getJSBundleFile() {
         return CodePush.getJSBundleFile(CodePushConstants.DEFAULT_JS_BUNDLE_NAME);
-        //return CodePush.getJSBundleFile(CodePushConstants.DEFAULT_JS_BUNDLE_NAME);
     }
 
     public static String getJSBundleFile(String assetsBundleFileName) {
@@ -142,13 +141,19 @@ public class CodePush implements ReactPackage {
 
     public String getJSBundleFileInternal(String assetsBundleFileName) {
         this.mAssetsBundleFileName = assetsBundleFileName;
+
+        String sourcePath = CodePushUtils.appendPathComponent(mContext.getFilesDir().getAbsolutePath(), CodePushConstants.CODE_PUSH_FOLDER_PREFIX+"Source/CodePush/");
+
         String binaryJsBundleUrl = CodePushConstants.ASSETS_BUNDLE_PREFIX +assetsBundleFileName;
+        binaryJsBundleUrl = sourcePath+"/"+assetsBundleFileName;
+
         long binaryResourcesModifiedTime = this.getBinaryResourcesModifiedTime();
 
         try {
             String packageFilePath = mUpdateManager.getCurrentPackageBundlePath(this.mAssetsBundleFileName);
             if (packageFilePath == null) {
                 // There has not been any downloaded updates.
+                System.out.println("==============season init==============");
                 CodePushUtils.logBundleUrl(binaryJsBundleUrl);
                 sIsRunningBinaryVersion = true;
                 return binaryJsBundleUrl;
@@ -292,5 +297,10 @@ public class CodePush implements ReactPackage {
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactApplicationContext) {
         return new ArrayList<>();
+    }
+
+
+    public static CodePush getCodePushInstance(){
+        return mCurrentInstance;
     }
 }
