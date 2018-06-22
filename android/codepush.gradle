@@ -46,7 +46,7 @@ gradle.projectsEvaluated {
 
             def resourcesDirConfigName = "resourcesDir${targetName}"
             def resourcesDir = elvisFile(config."${resourcesDirConfigName}") ?:
-                    file("$buildDir/intermediates/res/merged/${targetPath}")
+                    file("$buildDir/intermediates/res/merged/${productFlavorName}/${targetPath}")
 
             // In case version of 'Android Plugin for Gradle'' is lower than 1.3.0 
             // '$buildDir' has slightly different structure - 'merged' folder
@@ -56,7 +56,7 @@ gradle.projectsEvaluated {
             }
 
             //resource 路径
-            resourcesDir = file("$buildDir/intermediates/assets/release/source/CodePush") 
+            resourcesDir = file("$buildDir/intermediates/assets/${productFlavorName}/release/source/CodePush") 
 
             def jsBundleFile = file("$jsBundleDir/$bundleAssetName")
 
