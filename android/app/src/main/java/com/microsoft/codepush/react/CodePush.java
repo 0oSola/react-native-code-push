@@ -3,6 +3,7 @@ package com.microsoft.codepush.react;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactPackage;
@@ -140,13 +141,21 @@ public class CodePush implements ReactPackage {
     }
 
     public String getJSBundleFileInternal(String assetsBundleFileName) {
+        System.out.println("'test================'");
         this.mAssetsBundleFileName = assetsBundleFileName;
 
         String sourcePath = CodePushUtils.appendPathComponent(mContext.getFilesDir().getAbsolutePath(), CodePushConstants.CODE_PUSH_FOLDER_PREFIX+"Source/CodePush/");
+        String parentPath = CodePushUtils.appendPathComponent(mContext.getFilesDir().getAbsolutePath(), CodePushConstants.CODE_PUSH_FOLDER_PREFIX+"Source/");
 
         String binaryJsBundleUrl = CodePushConstants.ASSETS_BUNDLE_PREFIX +assetsBundleFileName;
         binaryJsBundleUrl = sourcePath+"/"+assetsBundleFileName;
+        File bundleDir = new File(binaryJsBundleUrl);
 
+        if(!bundleDir.exists()){
+            Log.v("season check",bundleDir.exists()+"");
+            Log.v("season check",binaryJsBundleUrl);
+            FileUtils.deleteDirectoryAtPath(parentPath);
+        }
         long binaryResourcesModifiedTime = this.getBinaryResourcesModifiedTime();
 
         try {

@@ -27,11 +27,10 @@ var jsBundleFilePath = process.argv[3];
 var assetsDir = process.argv[4];
 var tempFileName = process.argv[5];
 
-console.log("======sola:",tempFileName);
 
 var tempFileLocalPath = path.join(require("os").tmpdir(), tempFileName);
 
-console.log("======sola:",tempFileLocalPath);
+console.log("======codepushjson path:",tempFileLocalPath);
 var resourceFiles = [];
 
 getFilesInFolder(resourcesDir, resourceFiles);
@@ -39,23 +38,23 @@ getFilesInFolder(resourcesDir, resourceFiles);
 var oldFileToModifiedTimeMap = require(tempFileLocalPath);
 var newFileToModifiedTimeMap = {};
 
-console.log("test========");
+console.log("resourceFiles========");
 console.log(resourceFiles);
-console.log("test========");
+console.log("========");
 
 resourceFiles.forEach(function(resourceFile) {
     newFileToModifiedTimeMap[resourceFile.path.substring(resourcesDir.length)] = resourceFile.mtime;
 });
 
 
-    console.log("test after========");
-    console.log(resourceFiles);
-    console.log("test after========");
-
 var bundleGeneratedAssetFiles = [];
 
 for (var newFilePath in newFileToModifiedTimeMap) {
-    bundleGeneratedAssetFiles.push(newFilePath);
+    console.log('newFilePath:',newFilePath);
+    if(newFilePath.indexOf('codePush.txt')<0&&newFilePath.indexOf('codepush.zip')<0){
+        bundleGeneratedAssetFiles.push(newFilePath);
+    }
+    
     /*console.log("test filter before========");
     console.log(oldFileToModifiedTimeMap[newFilePath],oldFileToModifiedTimeMap[newFilePath],newFileToModifiedTimeMap[newFilePath].getTime());
     console.log("test filter after========");
@@ -69,15 +68,28 @@ var manifest = [];
 if (bundleGeneratedAssetFiles.length) {
     bundleGeneratedAssetFiles.forEach(function(assetFile) {
         // Generate hash for each asset file
+        
         addFileToManifest(resourcesDir, assetFile, manifest, function() {
             if (manifest.length === bundleGeneratedAssetFiles.length) {
                 addJsBundleAndMetaToManifest();
             }
         });
+        
     });
 } else {
     addJsBundleAndMetaToManifest();
 }
+
+
+
+deleteall(assetsDir+'/source/CodePush/drawable-hdpi');
+deleteall(assetsDir+'/source/CodePush/drawable-mdpi');
+deleteall(assetsDir+'/source/CodePush/drawable-xhdpi');
+deleteall(assetsDir+'/source/CodePush/drawable-xxhdpi');
+deleteall(assetsDir+'/source/CodePush/drawable-xxxhdpi');
+deleteall(assetsDir+'/source/CodePush/drawable-xxxhdpi');
+//deleteall(assetsDir+'/source/CodePush/index.android.bundle');
+//deleteall(assetsDir+'/source/CodePush/index.android.bundle.meta');
 
 function addJsBundleAndMetaToManifest() {
     /*addFileToManifest(path.dirname(jsBundleFilePath), path.basename(jsBundleFilePath), manifest, function() {
@@ -87,7 +99,7 @@ function addJsBundleAndMetaToManifest() {
         });
     });*/
     manifest = manifest.sort();
-    console.log("=================");
+    console.log("=======需要计算hash的文件==========");
     console.log(manifest);
     console.log("=================");
     var finalHash = crypto.createHash(HASH_ALGORITHM)
@@ -95,6 +107,7 @@ function addJsBundleAndMetaToManifest() {
         .digest("hex");
 
     console.log(finalHash);
+
 
     var savedResourcesManifestPath = assetsDir + "/" + CODE_PUSH_HASH_FILE_NAME;
     fs.writeFileSync(savedResourcesManifestPath, finalHash);
@@ -107,12 +120,14 @@ function addJsBundleAndMetaToManifest() {
     if (fs.existsSync(oldSavedResourcesManifestPath)) {
         fs.unlinkSync(oldSavedResourcesManifestPath);
     }
+
+    
 }
 
 function addFileToManifest(folder, assetFile, manifest, done) {
     var fullFilePath = path.join(folder, assetFile);
 
-    console.log("=================");
+    console.log("========单独文件hash计算=========");
     console.log(folder);
     console.log(assetFile);
     console.log(manifest);
@@ -136,6 +151,7 @@ function addFileToManifest(folder, assetFile, manifest, done) {
             var fileHash = buffer.toString("hex");
             manifest.push(path.join(CODE_PUSH_FOLDER_PREFIX, assetFile).replace(/\\/g, "/") + ":" + fileHash);
             done();
+
         });
 }
 
@@ -143,5 +159,23 @@ function fileExists(file) {
     try { return fs.statSync(file).isFile(); }
     catch (e) { return false; }
 }
+
+
+
+function deleteall(path) {
+    var files = [];
+    if(fs.existsSync(path)) {
+        files = fs.readdirSync(path);
+        files.forEach(function(file, index) {
+            var curPath = path + "/" + file;
+            if(fs.statSync(curPath).isDirectory()) { // recurse
+                deleteall(curPath);
+            } else { // delete file
+                fs.unlinkSync(curPath);
+            }
+        });
+        fs.rmdirSync(path);
+    }
+};
 
 fs.unlinkSync(tempFileLocalPath);
