@@ -81,15 +81,15 @@ if (bundleGeneratedAssetFiles.length) {
 }
 
 
-
+//清空打包后的资源
 deleteall(assetsDir+'/source/CodePush/drawable-hdpi');
 deleteall(assetsDir+'/source/CodePush/drawable-mdpi');
 deleteall(assetsDir+'/source/CodePush/drawable-xhdpi');
 deleteall(assetsDir+'/source/CodePush/drawable-xxhdpi');
 deleteall(assetsDir+'/source/CodePush/drawable-xxxhdpi');
 deleteall(assetsDir+'/source/CodePush/drawable-xxxhdpi');
-//deleteall(assetsDir+'/source/CodePush/index.android.bundle');
-//deleteall(assetsDir+'/source/CodePush/index.android.bundle.meta');
+fs.unlinkSync(assetsDir+'/source/CodePush/index.android.bundle');
+fs.unlinkSync(assetsDir+'/source/CodePush/index.android.bundle.meta');
 
 function addJsBundleAndMetaToManifest() {
     /*addFileToManifest(path.dirname(jsBundleFilePath), path.basename(jsBundleFilePath), manifest, function() {
@@ -177,5 +177,6 @@ function deleteall(path) {
         fs.rmdirSync(path);
     }
 };
+
 
 fs.unlinkSync(tempFileLocalPath);
