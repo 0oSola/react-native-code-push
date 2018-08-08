@@ -26,18 +26,19 @@ public class FileUtils {
             destDir.mkdir();
         }
 
-        System.out.println("seasonTest sourceDirectoryPath:"+sourceDirectoryPath);
+        System.out.println("sourceDirectoryPath is :"+sourceDirectoryPath);
 
         if (sourceDirectoryPath ==null || sourceDirectoryPath.isEmpty()) {
             System.out.println("==== create source folder=====");
             sourceDirectoryPath = FileCopyUtils.createCodePushFile(context);
+            Log.v("sourceDirectoryPath:",sourceDirectoryPath);
             sourceDir = new File(sourceDirectoryPath);
         }else{
             sourceDir = new File(sourceDirectoryPath);
         }
 
         for (File sourceFile : sourceDir.listFiles()) {
-            Log.v("season----",sourceFile.getName());
+            Log.v("sourceFile:",sourceFile.getName());
             if (sourceFile.isDirectory()) {
                 copyDirectoryContents(context,
                         CodePushUtils.appendPathComponent(sourceDirectoryPath, sourceFile.getName()),

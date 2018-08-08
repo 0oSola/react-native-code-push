@@ -233,6 +233,7 @@ public class CodePushUpdateManager {
             if (isDiffUpdate) {
                 System.out.println("=====isDiffUpdate====="+isDiffUpdate);
                 String currentPackageFolderPath = getCurrentPackageFolderPath();
+                System.out.println("=====currentPackageFolderPath====="+currentPackageFolderPath);
                 CodePushUpdateUtils.copyNecessaryFilesFromCurrentPackage(context,diffManifestFilePath, currentPackageFolderPath, newUpdateFolderPath);
                 File diffManifestFile = new File(diffManifestFilePath);
                 diffManifestFile.delete();

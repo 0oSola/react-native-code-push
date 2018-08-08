@@ -132,6 +132,7 @@ public class CodePushUpdateUtils {
         JSONArray updateContentsJSONArray = new JSONArray();
         for (String manifestEntry : updateContentsManifest) {
             updateContentsJSONArray.put(manifestEntry);
+
         }
 
         // The JSON serialization turns path separators into "\/", e.g. "CodePush\/assets\/image.png"
