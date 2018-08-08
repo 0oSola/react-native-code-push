@@ -5,6 +5,8 @@ import android.content.res.AssetManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.facebook.react.bridge.ReactContext;
+
 import org.json.JSONObject;
 
 import java.io.BufferedWriter;
@@ -130,11 +132,11 @@ public class FileCopyUtils {
     }
 
 
-    public static String createCodePushFile(Context context){
+    public static String createCodePushFile(ReactContext context){
         String mBinaryContentsHash = CodePushUpdateUtils.getHashForBinaryContents(context, false);
         String deployKey = CodePush.getCodePushInstance().getDeploymentKey();
         Log.v("season deploymentKey",deployKey+"");
-        Log.v("source mBinaryContentsHash",mBinaryContentsHash+"");
+        Log.v("source ContentsHash",mBinaryContentsHash+"");
 
         //String mBinaryContentsHash = "e9c79effc5b6bb19d54a6af676c513b96d4c8cac876dc5b857d47ed790bb2ad7";
 
@@ -155,8 +157,8 @@ public class FileCopyUtils {
             }
 
             String statusFilePath = CodePushUtils.appendPathComponent(codePushPath, CodePushConstants.STATUS_FILE);
-            Log.v("season",statusFilePath);
-            System.out.println(FileUtils.fileAtPathExists(statusFilePath));
+            Log.v("statusFilePath:",statusFilePath);
+            Log.v("statusFilePath Exists:",FileUtils.fileAtPathExists(statusFilePath)+"");
             if (!FileUtils.fileAtPathExists(statusFilePath)) {
                 try {
                     JSONObject mJSONObject =  new JSONObject();
@@ -182,13 +184,19 @@ public class FileCopyUtils {
                 bundleDir.mkdirs();
             }
 
-            //bundle
-            copyFilesFromAssets(context, "source/CodePush", bundlePath);
+            //拷贝 asset bundle
+            //copyFilesFromAssets(context, "source/CodePush", bundlePath);
+            //第一次热更 拷贝CodePushSoruce下的资源文件
+            String originSourcePath = CodePushUtils.appendPathComponent(context.getFilesDir().getAbsolutePath(),CodePushConstants.CODE_PUSH_FOLDER_PREFIX + "Source/CodePush");
+            Log.v("originSourcePath:",originSourcePath);
+            try {
+                FileUtils.copyDirectoryContents(context,originSourcePath,bundlePath);
+            }catch (IOException e){
+                e.printStackTrace();
+            }
 
-            /*copyFilesFromAssets(context, "index.android.bundle", bundlePath);
-            copyFilesFromAssets(context, "index.android.bundle.meta", bundlePath);*/
 
-            //app.json
+            //创建app.json
             String packageFilePath = CodePushUtils.appendPathComponent(codePushHashPath, CodePushConstants.PACKAGE_FILE_NAME);
             if (!FileUtils.fileAtPathExists(packageFilePath)) {
                 try {
