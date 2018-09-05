@@ -89,7 +89,7 @@ deleteall(assetsDir+'/source/CodePush/drawable-xxhdpi');
 deleteall(assetsDir+'/source/CodePush/drawable-xxxhdpi');
 deleteall(assetsDir+'/source/CodePush/drawable-xxxhdpi');
 fs.unlinkSync(assetsDir+'/source/CodePush/index.android.bundle');
-fs.unlinkSync(assetsDir+'/source/CodePush/index.android.bundle.meta');
+//fs.unlinkSync(assetsDir+'/source/CodePush/index.android.bundle.meta');
 
 function addJsBundleAndMetaToManifest() {
     /*addFileToManifest(path.dirname(jsBundleFilePath), path.basename(jsBundleFilePath), manifest, function() {
